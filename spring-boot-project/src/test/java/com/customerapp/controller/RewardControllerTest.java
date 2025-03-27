@@ -3,7 +3,6 @@ package com.customerapp.controller;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,39 +21,35 @@ import com.customerapp.service.RewardServices;
 @ExtendWith(MockitoExtension.class)
 public class RewardControllerTest {
 
-    @Mock
-    private RewardServices rewardService;
+	@Mock
+	private RewardServices rewardService;
 
-    @InjectMocks
-    private RewardController rewardController;
+	@InjectMocks
+	private RewardController rewardController;
 
-    private RewardPoints rewardPoints;
-    private List<RewardPoints> rewardPointsList;
+	private List<RewardPoints> rewardPointsList;
 
-    @BeforeEach
-    public void setUp() {
-        rewardPoints = new RewardPoints();
-        rewardPoints.setId(1);
-        rewardPoints.setPoints(100);
+	@BeforeEach
+	public void setUp() {
+		RewardPoints rewardPoints = RewardPoints.builder().id(1).points(150).build();
+		rewardPointsList = Arrays.asList(rewardPoints);
+	}
 
-        rewardPointsList = Arrays.asList(rewardPoints);
-    }
+	@Test
+	public void testCalculateRewards() {
+		ResponseEntity<String> response = rewardController.calculateRewards(1);
 
-    @Test
-    public void testCalculateRewards() {
-        ResponseEntity<String> response = rewardController.calculateRewards(1);
+		verify(rewardService).calculateAnsSaveRewards(1);
+		assertEquals("Reward points calculated and saved", response.getBody());
+	}
 
-        verify(rewardService).calculateAnsSaveRewards(1);
-        assertEquals("Reward points calculated and saved", response.getBody());
-    }
+	@Test
+	public void testGetRewards() {
+		when(rewardService.getRewardsPointsByCustomer(1)).thenReturn(rewardPointsList);
 
-    @Test
-    public void testGetRewards() {
-        when(rewardService.getRewardsPointsByCustomer(1)).thenReturn(rewardPointsList);
+		ResponseEntity<List<RewardPoints>> response = rewardController.getRewards(1);
 
-        ResponseEntity<List<RewardPoints>> response = rewardController.getRewards(1);
-
-        verify(rewardService).getRewardsPointsByCustomer(1);
-        assertEquals(rewardPointsList, response.getBody());
-    }
+		verify(rewardService).getRewardsPointsByCustomer(1);
+		assertEquals(rewardPointsList, response.getBody());
+	}
 }

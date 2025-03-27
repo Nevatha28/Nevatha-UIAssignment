@@ -10,25 +10,26 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Entity
 @Table(name = "transactions")
-@Data
+@AllArgsConstructor
 public class Transaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@ManyToOne
-	@JoinColumn(name= "customer_id",nullable = false)
+	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
-    
+
 	@Column(nullable = false)
-    private double amount;
-    
-    @Column(name= "transaction_date",nullable = false)
-    private LocalDate transactionDate;
+	private double amount;
+
+	@Column(name = "transaction_date", nullable = false)
+	private LocalDate transactionDate;
 
 	public Integer getId() {
 		return id;
@@ -46,7 +47,6 @@ public class Transaction {
 		this.customer = customer;
 	}
 
-
 	public double getAmount() {
 		return amount;
 	}
@@ -62,5 +62,5 @@ public class Transaction {
 	public void setTransactionDate(LocalDate transactionDate) {
 		this.transactionDate = transactionDate;
 	}
-    
+
 }

@@ -1,6 +1,8 @@
 package com.customerapp.controller;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,5 +31,12 @@ public class RewardController {
 	public ResponseEntity<List<RewardPoints>> getRewards(@PathVariable Integer customerId){
 		return ResponseEntity.ok(rewardService.getRewardsPointsByCustomer(customerId));
 	}
+	
+	@GetMapping("/lastThreeMonths/{customerId}")
+	public ResponseEntity<Map<String, Integer>> getThreeMonthsRewards(@PathVariable Integer customerId){
+		Map<String, Integer> rewards = rewardService.getLastThreeMonthsRewards(customerId);
+		return ResponseEntity.ok(rewards);
+	}
+	
 	
 }
