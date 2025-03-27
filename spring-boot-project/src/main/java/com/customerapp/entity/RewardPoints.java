@@ -1,8 +1,5 @@
 package com.customerapp.entity;
 
-import java.time.LocalDate;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,9 +10,10 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "rewards_points")
 @Data
-public class Transaction {
+public class RewardPoints {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -23,12 +21,10 @@ public class Transaction {
 	@ManyToOne
 	@JoinColumn(name= "customer_id",nullable = false)
 	private Customer customer;
-    
-	@Column(nullable = false)
-    private double amount;
-    
-    @Column(name= "transaction_date",nullable = false)
-    private LocalDate transactionDate;
+	
+	private  String month;
+	
+	private Integer points;
 
 	public Integer getId() {
 		return id;
@@ -46,21 +42,23 @@ public class Transaction {
 		this.customer = customer;
 	}
 
-
-	public double getAmount() {
-		return amount;
+	public String getMonth() {
+		return month;
 	}
 
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public void setMonth(String month) {
+		this.month = month;
 	}
 
-	public LocalDate getTransactionDate() {
-		return transactionDate;
+	public Integer getPoints() {
+		return points;
 	}
 
-	public void setTransactionDate(LocalDate transactionDate) {
-		this.transactionDate = transactionDate;
+	public void setPoints(Integer points) {
+		this.points = points;
 	}
-    
+	
+	
+	
+
 }

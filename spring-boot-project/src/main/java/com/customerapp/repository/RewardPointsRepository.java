@@ -4,14 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.customerapp.entity.Transaction;
-
-
+import com.customerapp.entity.RewardPoints;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Integer>{
-	
- List<Transaction> findByCustomerId(Integer customerId);
+public interface RewardPointsRepository extends JpaRepository<RewardPoints, Integer>{
 
+	List<RewardPoints> findByCustomerId(Integer customerId);
 }

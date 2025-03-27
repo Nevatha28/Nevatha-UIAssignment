@@ -1,5 +1,6 @@
 package com.customerapp.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +9,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.customerapp.entity.Customer;
+import com.customerapp.entity.RewardPoints;
+import com.customerapp.entity.Transaction;
+import com.customerapp.repository.CustomerRepository;
+import com.customerapp.repository.RewardPointsRepository;
 import com.customerapp.repository.TransactionRepository;
+
+import jakarta.transaction.UserTransaction;
 
 @Service
 public class RewardServices {
@@ -16,34 +24,45 @@ public class RewardServices {
 	@Autowired
 	private TransactionRepository transactionRepository ;
 	
-	public List<Map<String, Object>> getMonthlyRewards(){
-		
-		List<Object[]> results = transactionRepository.getRewardPointsPerMonth();
-		List<Map<String, Object>> response = new ArrayList<>();
-		for(Object[] row : results) {
-			Map<String, Object> data = new HashMap<>();
-			data.put("customerId", row[0]);
-			data.put("month", row[1]);
-			data.put("rewardPoints", row[2]);
-			response.add(data);
+	@Autowired
+	private RewardPointsRepository rewardPointsRepository ;
+	
+	@Autowired
+	private CustomerRepository customerRepository ;
+	
+	
+	
+	
+	public int CalculateRewardPoints(double amount) {
+		int points = 0;
+		if(amount > 100) {
+			points += (int)((amount - 100)*2);
+			amount = 100;
 		}
-		return response;
-	}
-	
-	public List<Map<String, Object>> getTotalRewards(){
-		
-		List<Object[]> results = transactionRepository.getTotalRewardPoints();
-		List<Map<String, Object>> response = new ArrayList<>();
-		for(Object[] row : results) {
-			Map<String, Object> data = new HashMap<>();
-			data.put("customerId", row[0]);
-			data.put("totalRewardPoints", row[2]);
-			response.add(data);
+		if(amount > 50) {
+			points +=(int)((amount - 50)*1);
 		}
-		return response;
-	
+		return points;
 	}
-	
-	
-	
+	public void calculateAnsSaveRewards(Integer customerId) {
+		Customer customer = customerRepository.findById(customerId).orElseThrow(()-> new RuntimeException("Customer not found"));
+		List<Transaction> transactions = transactionRepository.findByCustomerId(customerId);
+		Map<String,Integer> monthlyRewards = new HashMap<>();
+		for(Transaction transaction: transactions) {
+			String month = transaction.getTransactionDate().getYear() + "-" + transaction.getTransactionDate().getMonth();
+			int points = CalculateRewardPoints(transaction.getAmount());
+			monthlyRewards.put(month, monthlyRewards.getOrDefault(month, 0) + points) ;
+		}
+		for(Map.Entry<String, Integer> entry : monthlyRewards.entrySet()) {
+			RewardPoints rewardPoints = new RewardPoints();
+			rewardPoints.setCustomer(customer);
+			rewardPoints.setMonth(entry.getKey());
+			rewardPoints.setPoints(entry.getValue());
+			rewardPointsRepository.save(rewardPoints);
+		}
+	}
+	public List<RewardPoints> getRewardsPointsByCustomer(Integer customerId){
+		return rewardPointsRepository.findByCustomerId(customerId);
+	}
+		
 }
